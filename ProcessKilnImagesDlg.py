@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessKilnImages-dlg.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,26 +11,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(533, 337)
+        Dialog.resize(777, 552)
         self.verticalLayoutWidget = QtWidgets.QWidget(Dialog)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 252, 310))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 491, 521))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.widgetOriginal = QtWidgets.QWidget(self.verticalLayoutWidget)
-        self.widgetOriginal.setObjectName("widgetOriginal")
-        self.verticalLayout.addWidget(self.widgetOriginal)
-        self.labHistogram = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.labHistogram.setMinimumSize(QtCore.QSize(250, 100))
-        self.labHistogram.setObjectName("labHistogram")
-        self.verticalLayout.addWidget(self.labHistogram)
-        self.labFinal = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.labFinal.setMinimumSize(QtCore.QSize(250, 100))
-        self.labFinal.setObjectName("labFinal")
-        self.verticalLayout.addWidget(self.labFinal)
+        self.widget = QtWidgets.QWidget(self.verticalLayoutWidget)
+        self.widget.setObjectName("widget")
+        self.verticalLayout.addWidget(self.widget)
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(Dialog)
-        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(270, 10, 251, 221))
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(520, 10, 251, 221))
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 9)
@@ -141,8 +133,6 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.labHistogram.setText(_translate("Dialog", "TextLabel"))
-        self.labFinal.setText(_translate("Dialog", "TextLabel"))
         self.btnPrevious.setText(_translate("Dialog", "Previous"))
         self.btnNext.setText(_translate("Dialog", "Next"))
         self.btnGreyScale.setText(_translate("Dialog", "Grey Scale"))

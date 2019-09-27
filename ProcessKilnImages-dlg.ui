@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>337</height>
+    <width>777</width>
+    <height>552</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,46 +18,20 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>252</width>
-     <height>310</height>
+     <width>491</width>
+     <height>521</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="widgetOriginal" native="true"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="labHistogram">
-      <property name="minimumSize">
-       <size>
-        <width>250</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="labFinal">
-      <property name="minimumSize">
-       <size>
-        <width>250</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
+     <widget class="QWidget" name="widget" native="true"/>
     </item>
    </layout>
   </widget>
   <widget class="QWidget" name="verticalLayoutWidget_2">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>520</x>
      <y>10</y>
      <width>251</width>
      <height>221</height>

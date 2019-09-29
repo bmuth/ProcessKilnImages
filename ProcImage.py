@@ -14,7 +14,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-#from skimage import feature
+from skimage import io
 from scipy import ndimage
 from matplotlib.patches import Rectangle
 
@@ -35,6 +35,8 @@ class myDialog (QtWidgets.QDialog):
         self.ui.hsbSigma.valueChanged.connect (self.OnSigmaScrollBarChanged)
         self.ui.btnApplyMask.clicked.connect (self.OnApplyMaskClicked)
         self.ui.btnFindRegions.clicked.connect (self.OnFindRegionsClicked)
+        self.ui.btnSplit.clicked.connect (self.OnSplitClicked)
+        self.ui.btnSave.clicked.connect (self.OnSaveClicked)
 
         # create list of input files
         # --------------------------
@@ -68,6 +70,62 @@ class myDialog (QtWidgets.QDialog):
 
         self.show()
 
+    def OnSaveClicked (self):
+        for img in self.ImgLst:
+            io.imsave ('trythins.png', img)
+            return
+
+    def OnSplitClicked (self):
+        print ("OnSplitClicked clicked")
+        no_images = len(self.ImgLst)
+        if (no_images > 5):
+            self.Msg ("Two many islands found. {0}".format (no_images))
+            return
+
+        # get a character for each image
+
+        digits = list(self.ui.leDigits.text ())
+        if (no_images != len(digits)):
+            self.Msg ("No images {0} must match no digits {1}".format(no_images, len(digits)))
+            return
+
+
+        self.ax3 = None
+        no = 0
+        NewImgLst = list()
+        for img in self.ImgLst:
+            NewImgLst.append (self.Resize(img))
+        self.ImgLst = NewImgLst
+
+        for img in self.ImgLst:
+            ax = plt.subplot (3,5,11 + no)
+            #ax.set_axis_off()
+            plt.setp(ax.get_yticklabels(), visible=False)
+            plt.setp(ax.get_xticklabels(), visible=False)
+            ax.xaxis.set_ticks_position('none') 
+            ax.yaxis.set_ticks_position('none')
+            plt.xlabel (str(digits[no]))
+            ax.imshow (img)
+            no += 1
+
+        self.canvas.draw()
+
+    def Resize (self, img):
+        target_width = int (self.ui.leWidth.text())
+        target_height = int (self.ui.leHeight.text ())
+        left = (target_width - img.shape[1]) // 2
+        right = (target_width - img.shape[1] + 1) // 2
+        top = (target_height - img.shape[0]) // 2
+        bottom = (target_height - img.shape[0] + 1) // 2
+        if (left + right + img.shape[1] != target_width):
+            self.Msg ("width {0} + padding {1} doesn't match total width {2}".format (img.shape[1], left + right, total_width))
+            return None
+        if (top + bottom + img.shape[0] != target_height):
+            self.Msg ("height {0} + padding {1} doesn't match total height {2}".format (img.shape[0], top+bottom, total_height))
+            return None
+        img = np.lib.pad (img, ((top, bottom), (left, right)), 'constant', constant_values = 0)
+        return img
+
     def OnFindRegionsClicked (self):
         # label connected regions, and no. of regions
         label_im, nb_labels = ndimage.label(self.MaskImage)
@@ -76,8 +134,11 @@ class myDialog (QtWidgets.QDialog):
         # sort from left to right
         tup.sort(key = sortregion)
 
+        if (self.ax3 == None):
+            self.ax3 = plt.subplot(313)
+
         self.ax3.imshow (self.GaussianImage)
-        lm = list()
+        self.ImgLst = list()
         for v in tup:
             t = v[0].start
             b = v[0].stop
@@ -85,18 +146,20 @@ class myDialog (QtWidgets.QDialog):
             r = v[1].stop
             
             rect = Rectangle((l,t), r - l, b - t, edgecolor='g', facecolor='none')
-            self.ax3.gca().add_patch(rect)
+            self.ax3.add_patch(rect)
             print (t,l, r-l, b-t)
-            lm.append(i5[v[0],v[1]])
+            self.ImgLst.append(self.GaussianImage[v])
 
         self.canvas.draw()
         
     def OnApplyMaskClicked  (self):
         plt.rc('image', cmap='gray')
         self.MaskImage = self.GaussianImage > self.GaussianImage.mean()
-        self.ax3.cla()
 
         # plot data
+        if (self.ax3 == None):
+            self.ax3 = plt.subplot(313)
+        self.ax3.cla()
         self.ax3.imshow (self.MaskImage)
         self.canvas.draw()
 
@@ -112,6 +175,8 @@ class myDialog (QtWidgets.QDialog):
         self.ThresholdImage = np.copy (self.GreyImage)
         threshold_indices = self.ThresholdImage < self.threshold
         self.ThresholdImage[threshold_indices] = 0
+        if (self.ax3 == None):
+            self.ax3 = plt.subplot(313)
         self.ax3.cla()
 
         # plot data
@@ -123,6 +188,8 @@ class myDialog (QtWidgets.QDialog):
         print ("OnSigmaChanged: {0}".format (self.sigma))
         self.ui.hsbSigma.setValue (self.sigma * 10)
         self.GaussianImage = ndimage.gaussian_filter(self.ThresholdImage, sigma=self.sigma)
+        if (self.ax3 == None):
+            self.ax3 = plt.subplot(313)
         self.ax3.cla()
 
         # plot data
@@ -150,7 +217,8 @@ class myDialog (QtWidgets.QDialog):
     def OnGreyScaleClicked (self):
         print ("grey scale clicked")
         self.GreyImage = rgb2grey (self.OrigImage)
-        self.ax3 = plt.subplot (313)
+        if (self.ax3 == None):
+            self.ax3 = plt.subplot(313)
         self.ax3.cla()
 
         # plot data
@@ -207,6 +275,9 @@ class myDialog (QtWidgets.QDialog):
 
         # refresh canvas
         self.canvas.draw()
+    
+    def Msg (self, msg):
+        self.ui.leMsg.setText (msg)
 
 # define greyscale conversion routine
 # -----------------------------------

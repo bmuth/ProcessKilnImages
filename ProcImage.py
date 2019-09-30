@@ -40,14 +40,14 @@ class myDialog (QtWidgets.QDialog):
         # create list of input files
         # --------------------------
 
-        path = os.path.dirname (__file__) + '\\images'
+        path = os.getcwd() + '\\images'
+        print (path)
         self.files = []
-        for r, _, f in os.walk (path):
-            for file in f:
-                if ('.png' in file):
-                    self.files.append (os.path.join(r, file))
+        for f in os.listdir (path):
+            if ('.png' in f):
+                self.files.append (os.path.join(path, f))
         self.file_index = 0
-
+        self.files.sort ()
 
 #       a figure instance to plot on
         self.OrigFigure = plt.figure()
@@ -69,6 +69,9 @@ class myDialog (QtWidgets.QDialog):
 
         self.show()
 
+        if (len(self.files) == 0):
+            self.Msg ("No files are loaded!")
+
     def AutoProcess (self):
         self.OnGreyScaleClicked ()
         self.OnHistogramClicked ()
@@ -80,18 +83,22 @@ class myDialog (QtWidgets.QDialog):
         self.ui.leDigits.setFocus ()
 
     def OnSaveClicked (self):
+        if (len(self.digits) != len(self.ImgLst)):
+            self.Msg ("SAVE ABORTED: no. digits don't match no. images")
+            return
+
         i = 0
 
         for img in self.ImgLst:
             c = str(self.digits[i])
             if (c == "."):
                 c = "-"
-            path = os.path.dirname (__file__) + '\\images\\' + c
+            path = os.getcwd() + '\\images\\' + c
             if (not os.path.isdir (path)):
                 os.mkdir (path)
             try:
                 filename = os.path.join (path, os.path.splitext (self.Filename)[0])
-                filename += "__"
+                filename += "_" + "_" * i
                 filename += c
                 filename += ".png"
                 if (os.path.isfile (filename)):
@@ -258,13 +265,14 @@ class myDialog (QtWidgets.QDialog):
 
     def OnNextClicked (self):
         self.Msg ("")
-        print ("next clicked")
+        print ("next clicked. file index={0}. No. Files={1}".format(self.file_index, len(self.files)))
         # self.Plot()
         if (self.file_index > len(self.files)):
             return
         filename = self.files[self.file_index]
         self.OrigImage = mpimg.imread (filename)
         self.Filename = os.path.basename (filename)
+        self.ui.labFilename.setText (self.Filename)
         self.ax1.cla()
 
         # plot data
@@ -278,22 +286,6 @@ class myDialog (QtWidgets.QDialog):
         if (self.ui.cbAutoProcess.isChecked()) :
             self.AutoProcess ()
 
-    def Plot(self):
-        ''' plot some random stuff '''
-        # random data
-        data = [random.random() for i in range(10)]
-
-        # instead of ax.hold(False)
-        self.OrigFigure.clear()
-        # create an axis
-        ax = self.OrigFigure.add_subplot(111)
-
-        # plot data
-        ax.plot(data, '*-')
-
-        # refresh canvas
-        self.canvas.draw()
-
     def OnPreviousClicked (self):
         self.Msg ("")
         print ("previous clicked")
@@ -304,6 +296,7 @@ class myDialog (QtWidgets.QDialog):
         filename = self.files[self.file_index]
         self.OrigImage = mpimg.imread (filename)
         self.Filename = os.path.basename (filename)
+        self.ui.labFilename.setText (self.Filename)
 
         self.ax1.cla()
 

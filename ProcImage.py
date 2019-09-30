@@ -8,7 +8,6 @@ import random
 import matplotlib
 matplotlib.use('QT5Agg')
 
-#import matplotlib.pylab as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -70,10 +69,38 @@ class myDialog (QtWidgets.QDialog):
 
         self.show()
 
+    def AutoProcess (self):
+        self.OnGreyScaleClicked ()
+        self.OnHistogramClicked ()
+        self.OnThresholdChanged ()
+        self.OnSigmaChanged ()
+        self.OnApplyMaskClicked ()
+        self.OnFindRegionsClicked ()
+        self.ui.leDigits.setText ("")
+        self.ui.leDigits.setFocus ()
+
     def OnSaveClicked (self):
+        i = 0
+
         for img in self.ImgLst:
-            io.imsave ('trythins.png', img)
-            return
+            c = str(self.digits[i])
+            if (c == "."):
+                c = "-"
+            path = os.path.dirname (__file__) + '\\images\\' + c
+            if (not os.path.isdir (path)):
+                os.mkdir (path)
+            try:
+                filename = os.path.join (path, os.path.splitext (self.Filename)[0])
+                filename += "__"
+                filename += c
+                filename += ".png"
+                if (os.path.isfile (filename)):
+                    self.Msg ("file {0} overwritten.".format (filename))
+                io.imsave (filename, img)
+            except:
+                self.Msg ("Failed to save {0}".format (filename))
+            finally:
+                i += 1
 
     def OnSplitClicked (self):
         print ("OnSplitClicked clicked")
@@ -84,9 +111,9 @@ class myDialog (QtWidgets.QDialog):
 
         # get a character for each image
 
-        digits = list(self.ui.leDigits.text ())
-        if (no_images != len(digits)):
-            self.Msg ("No images {0} must match no digits {1}".format(no_images, len(digits)))
+        self.digits = list(self.ui.leDigits.text ())
+        if (no_images != len(self.digits)):
+            self.Msg ("No images {0} must match no digits {1}".format(no_images, len(self.digits)))
             return
 
 
@@ -104,7 +131,7 @@ class myDialog (QtWidgets.QDialog):
             plt.setp(ax.get_xticklabels(), visible=False)
             ax.xaxis.set_ticks_position('none') 
             ax.yaxis.set_ticks_position('none')
-            plt.xlabel (str(digits[no]))
+            plt.xlabel (str(self.digits[no]))
             ax.imshow (img)
             no += 1
 
@@ -137,7 +164,7 @@ class myDialog (QtWidgets.QDialog):
         if (self.ax3 == None):
             self.ax3 = plt.subplot(313)
 
-        self.ax3.imshow (self.GaussianImage)
+        self.ax3.imshow (self.GreyImage)
         self.ImgLst = list()
         for v in tup:
             t = v[0].start
@@ -148,7 +175,7 @@ class myDialog (QtWidgets.QDialog):
             rect = Rectangle((l,t), r - l, b - t, edgecolor='g', facecolor='none')
             self.ax3.add_patch(rect)
             print (t,l, r-l, b-t)
-            self.ImgLst.append(self.GaussianImage[v])
+            self.ImgLst.append(self.GreyImage[v])
 
         self.canvas.draw()
         
@@ -209,9 +236,10 @@ class myDialog (QtWidgets.QDialog):
         image = self.GreyImage
 
         ar = image.ravel()
-        print (len(ar))
-        print ("avg={0} std={1} max={2}".format (sum(ar)/len(ar), np.std(ar), ar.max()))
-        self.ax2.hist (image.ravel(), bins=256, range=(0.0, 1.0))
+        ar2 = ar[ar != 0]
+        print ("original array size: {0} non-zero size {1}".format (len(ar), len(ar2)))
+        print ("avg={0} std={1} max={2}".format (sum(ar2)/len(ar2), np.std(ar2), ar2.max()))
+        self.ax2.hist (ar2, bins=255, range=(0.0, 1.0))
         self.canvas.draw()
 
     def OnGreyScaleClicked (self):
@@ -229,11 +257,14 @@ class myDialog (QtWidgets.QDialog):
         self.canvas.draw()
 
     def OnNextClicked (self):
+        self.Msg ("")
         print ("next clicked")
         # self.Plot()
         if (self.file_index > len(self.files)):
             return
-        self.OrigImage = mpimg.imread (self.files[self.file_index])
+        filename = self.files[self.file_index]
+        self.OrigImage = mpimg.imread (filename)
+        self.Filename = os.path.basename (filename)
         self.ax1.cla()
 
         # plot data
@@ -244,6 +275,8 @@ class myDialog (QtWidgets.QDialog):
         self.canvas.draw()
 
         self.file_index += 1
+        if (self.ui.cbAutoProcess.isChecked()) :
+            self.AutoProcess ()
 
     def Plot(self):
         ''' plot some random stuff '''
@@ -262,12 +295,16 @@ class myDialog (QtWidgets.QDialog):
         self.canvas.draw()
 
     def OnPreviousClicked (self):
+        self.Msg ("")
         print ("previous clicked")
         if (self.file_index <= 0):
             return
         self.file_index -= 1
 
-        self.OrigImage = mpimg.imread (self.files[self.file_index])
+        filename = self.files[self.file_index]
+        self.OrigImage = mpimg.imread (filename)
+        self.Filename = os.path.basename (filename)
+
         self.ax1.cla()
 
         # plot data
@@ -275,6 +312,9 @@ class myDialog (QtWidgets.QDialog):
 
         # refresh canvas
         self.canvas.draw()
+
+        if (self.ui.cbAutoProcess.isChecked()) :
+            self.AutoProcess ()
     
     def Msg (self, msg):
         self.ui.leMsg.setText (msg)

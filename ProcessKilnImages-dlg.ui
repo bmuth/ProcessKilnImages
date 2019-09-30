@@ -50,7 +50,7 @@
     <rect>
      <x>510</x>
      <y>10</y>
-     <width>311</width>
+     <width>328</width>
      <height>358</height>
     </rect>
    </property>
@@ -377,6 +377,23 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Digits:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="leDigits">
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnSplit">
         <property name="text">
          <string>Split</string>
@@ -401,23 +418,6 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Digits:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="leDigits">
-        <property name="maximumSize">
-         <size>
-          <width>50</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="btnSave">
         <property name="text">
          <string>Save</string>
@@ -427,9 +427,9 @@
      </layout>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QCheckBox" name="cbAutoProcess">
       <property name="text">
-       <string>AutoProcess</string>
+       <string>CheckBox</string>
       </property>
      </widget>
     </item>

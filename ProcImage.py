@@ -218,9 +218,9 @@ class myDialog (QtWidgets.QDialog):
         self.canvas.draw()
 
     def OnSigmaChanged (self):
-        self.sigma = int (self.ui.leSigma.text())
+        self.sigma = float (self.ui.leSigma.text())
         print ("OnSigmaChanged: {0}".format (self.sigma))
-        self.ui.hsbSigma.setValue (self.sigma * 10)
+        self.ui.hsbSigma.setValue (int (self.sigma * 10))
         self.GaussianImage = ndimage.gaussian_filter(self.ThresholdImage, sigma=self.sigma)
         if (self.ax3 == None):
             self.ax3 = plt.subplot(313)
@@ -232,8 +232,8 @@ class myDialog (QtWidgets.QDialog):
         print ("OnSigmaChanged done")
 
     def OnSigmaScrollBarChanged (self):
-        self.sigma = self.ui.hsbSigma.value () // 10
-        self.ui.leSigma.setText ("{:d}".format (self.sigma))
+        self.sigma = self.ui.hsbSigma.value () / 10
+        self.ui.leSigma.setText ("{:f}".format (self.sigma))
         self.OnSigmaChanged ()
 
 

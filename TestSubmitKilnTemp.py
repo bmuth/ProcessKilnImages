@@ -2,20 +2,22 @@ import socket
 import os
 import struct
 
-#HOST = '127.0.0.1'  # The server's hostname or IP address
+HOST = '192.168.0.17'  # The server's hostname or IP address
 PORT = 65432        # The port used by the server
-PATH = "E:\\Utilities\Qt\\ProcessKilnImages\\data\\images"
-
+#PATH = "E:\\Utilities\Qt\\ProcessKilnImages\\data\\images"
+PATH = "/home/pi/Documents/Projects/KilnProfiler"
 
 def SubmitFile (orig_filename):
-    host = socket.gethostbyname(socket.gethostname())
+    host = socket.gethostbyname(HOST)
+
+    filename = os.path.join (PATH, orig_filename)
 
     try:
+        fs = int (os.path.getsize(filename))
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(3)
             s.connect((host, PORT))
             c = 'F'
-            filename = os.path.join (PATH, orig_filename)
-            fs = int (os.path.getsize(filename))
 
             # 1 byte command
             # 4 bytes for file size
@@ -33,11 +35,21 @@ def SubmitFile (orig_filename):
                     byte = f.read(4096)
                 data = s.recv(1024)
                 print('Response: [{0}]'.format (data.decode('utf-8')))
+                return
     except ConnectionError as e:
-        print ("connection error for host {0} {1} {2}".format(host, e.errno, e.strerror))
+        msg = "connection error for host {0} {1}".format(host, str(e))
+        print (msg)
+        raise
+
+    except FileNotFoundError:
+        msg = "file {0} not found".format (filename)
+        print (msg)
+        raise
 
     except IOError as e:
-        print ("transmission error on file {0} {1} {2}".format(filename, e.errno, e.strerror))
+        msg = "transmission error on file {0} {1}".format(orig_filename, str(e))
+        print (msg)
+        raise
 
 orig_filename = "K2019-09-23 06.34.14.png"
 
@@ -49,5 +61,10 @@ orig_filename = "K2019-09-23 06.34.14.png"
 # # b = "{:<2}".format (filename).encode ('utf-8')
 # # data = struct.pack ('50s', "{:<50}".format (filename).encode ('utf-8'))
 # data = struct.pack ('=cI100s', c.encode('utf-8'), fs, "{:<100}".format (filename).encode ('utf-8'))
-SubmitFile (orig_filename)
+try:
+    SubmitFile (orig_filename)
+except Exception as e:
+    print ("err: {0}".format (str(e)))
+
+x = 4
 

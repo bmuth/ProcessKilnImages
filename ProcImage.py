@@ -40,7 +40,8 @@ class myDialog (QtWidgets.QDialog):
         # create list of input files
         # --------------------------
 
-        path = os.getcwd() + '\\images'
+        #path = os.getcwd() + '\\images'
+        path = os.path.join (os.getcwd(), 'data\\Nov 04 2019')
         print (path)
         self.files = []
         for f in os.listdir (path):
@@ -93,7 +94,7 @@ class myDialog (QtWidgets.QDialog):
             c = str(self.digits[i])
             if (c == "."):
                 c = "-"
-            path = os.getcwd() + '\\images\\' + c
+            path = os.path.join (os.getcwd(), 'data\\images\\') + c
             if (not os.path.isdir (path)):
                 os.mkdir (path)
             try:
@@ -139,7 +140,8 @@ class myDialog (QtWidgets.QDialog):
             ax.xaxis.set_ticks_position('none') 
             ax.yaxis.set_ticks_position('none')
             plt.xlabel (str(self.digits[no]))
-            ax.imshow (img)
+            if (type(img) is not None) :
+                ax.imshow (img)
             no += 1
 
         self.canvas.draw()
@@ -151,6 +153,12 @@ class myDialog (QtWidgets.QDialog):
         right = (target_width - img.shape[1] + 1) // 2
         top = (target_height - img.shape[0]) // 2
         bottom = (target_height - img.shape[0] + 1) // 2
+        if (target_width < img.shape[1]) :
+            self.Msg ("The image width is {0}. Specify a wider width".format (img.shape[1]))
+            return None
+        if (target_height < img.shape[0]) :
+            self.Msg ("The image height is {0}. Specify a higher height".format (img.shape[0]))
+            return None
         if (left + right + img.shape[1] != target_width):
             self.Msg ("width {0} + padding {1} doesn't match total width {2}".format (img.shape[1], left + right, total_width))
             return None
